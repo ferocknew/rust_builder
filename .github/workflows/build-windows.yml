@@ -1,0 +1,40 @@
+name: Build Windows Exe
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Windows executable
+      run: npm run build
+
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-exe
+        path: src-tauri/target/release/bundle/nsis/课表管理系统_1.0.0_x64-setup.exe
+        retention-days: 30

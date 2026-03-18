@@ -1,0 +1,19 @@
+{
+  "name": "class-schedule-system",
+  "version": "1.0.0",
+  "description": "课表管理系统",
+  "main": "index.html",
+  "scripts": {
+    "tauri": "tauri",
+    "build": "tauri build"
+  },
+  "keywords": [
+    "tauri",
+    "课表管理"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.0"
+  }
+}

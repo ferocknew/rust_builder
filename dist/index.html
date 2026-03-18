@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课表管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: white;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            overflow: hidden; /* 禁止滚动条 */
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 12px 5px 12px 5px; /* 上右下左：12px 5px 12px 5px */
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #e9ecef;
+            border-color: #c1c1c1;
+        }
+
+        .btn:active {
+            background-color: #dee2e6;
+            transform: translateY(1px);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .btn-text {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="button-row">
+            <a href="#" class="btn" onclick="showAlert('课程设置'); return false;">
+                <span class="btn-icon">📋</span>
+                <span class="btn-text">课程设置</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('生成新课表文件'); return false;">
+                <span class="btn-icon">📝</span>
+                <span class="btn-text">生成新课表文件</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('课表检验'); return false;">
+                <span class="btn-icon">🔍</span>
+                <span class="btn-text">课表检验</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('生成班级课表'); return false;">
+                <span class="btn-icon">👥</span>
+                <span class="btn-text">生成班级课表</span>
+            </a>
+        </div>
+        <div class="button-row">
+            <a href="#" class="btn" onclick="showAlert('生成教师课表'); return false;">
+                <span class="btn-icon">👨‍🏫</span>
+                <span class="btn-text">生成教师课表</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('生成学生课表'); return false;">
+                <span class="btn-icon">🎓</span>
+                <span class="btn-text">生成学生课表</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('设置课表页面'); return false;">
+                <span class="btn-icon">⚙️</span>
+                <span class="btn-text">设置课表页面</span>
+            </a>
+            <a href="#" class="btn" onclick="showAlert('关于'); return false;">
+                <span class="btn-icon">ℹ️</span>
+                <span class="btn-text">关于</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function showAlert(buttonName) {
+            alert('测试功能：' + buttonName);
+        }
+    </script>
+</body>
+</html>
