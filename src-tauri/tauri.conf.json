@@ -21,7 +21,7 @@
     },
     "bundle": {
       "active": true,
-      "targets": ["msi", "nsis"],
+      "targets": ["nsis"],
       "identifier": "com.class-schedule.system",
       "icon": [
         "icons/32x32.png",
