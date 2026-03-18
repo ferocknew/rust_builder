@@ -8,7 +8,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "课表管理系统",
+    "productName": "ClassScheduleSystem",
     "version": "1.0.0"
   },
   "tauri": {
