@@ -1,0 +1,101 @@
+name: Build Multi-Platform Executables
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Windows portable executable
+      run: cargo tauri build --no-bundle
+
+    - name: Upload Windows portable exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-portable-exe
+        path: src-tauri/target/release/课表管理系统.exe
+        retention-days: 30
+
+    - name: Create Release and upload exe
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: src-tauri/target/release/课表管理系统.exe
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build macOS app bundle
+      run: cargo tauri build
+
+    - name: Upload macOS app
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-app
+        path: src-tauri/target/release/bundle/macos/课表管理系统.app
+        retention-days: 30
+
+    - name: Upload macOS DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-dmg
+        path: src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
+        retention-days: 30
+
+    - name: Create Release and upload macOS app
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
+        draft: false
+        prerelease: false
+        generate_release_notes: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
