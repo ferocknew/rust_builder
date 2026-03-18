@@ -32,23 +32,23 @@
 
 ### 安装依赖
 
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 ### 开发模式运行
 
-\`\`\`bash
+```bash
 npm run tauri dev
-\`\`\`
+```
 
 ## 构建可执行文件
 
 ### 构建当前平台版本
 
-\`\`\`bash
+```bash
 npm run build
-\`\`\`
+```
 
 构建完成后，可执行文件位于：
 
@@ -82,7 +82,7 @@ npm run build
 
 ## 项目结构
 
-\`\`\`
+```
 .
 ├── dist/                    # 前端资源文件
 │   └── index.html          # 主页面
@@ -97,7 +97,7 @@ npm run build
 │       └── build-windows.yml  # GitHub Actions工作流
 ├── package.json           # Node.js依赖配置
 └── README.md             # 项目说明
-\`\`\`
+```
 
 ## 许可证
 
