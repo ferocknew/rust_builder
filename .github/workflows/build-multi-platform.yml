@@ -1,101 +1,138 @@
-name: Build Multi-Platform Executables
+name: Build and Release
 
 on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
 
-permissions:
-  contents: write
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
+  # 构建 Windows 版本
   build-windows:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build Windows portable executable
-      run: cargo build --release --manifest-path=src-tauri/Cargo.toml
+      - name: Build Windows portable executable
+        run: cargo build --release --manifest-path=src-tauri/Cargo.toml
 
-    - name: Upload Windows portable exe
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-portable-exe
-        path: src-tauri/target/release/课表管理系统.exe
-        retention-days: 30
+      - name: Get version
+        id: get_version
+        run: |
+          if (Test-Path "VERSION") {
+            $VERSION = Get-Content VERSION
+            echo "VERSION=$VERSION" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "VERSION=1.0.0" >> $env:GITHUB_OUTPUT
+          }
 
-    - name: Create Release and upload exe
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: src-tauri/target/release/课表管理系统.exe
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: src-tauri/target/release/课表管理系统.exe
 
+  # 构建 macOS 版本
   build-macos:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build macOS app bundle
-      run: npm run build
+      - name: Build macOS app bundle
+        run: npm run build
 
-    - name: Upload macOS app
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-app
-        path: src-tauri/target/release/bundle/macos/课表管理系统.app
-        retention-days: 30
+      - name: Get version
+        id: get_version
+        run: |
+          if [ -f "VERSION" ]; then
+            VERSION=$(cat VERSION)
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=1.0.0" >> $GITHUB_OUTPUT
+          fi
 
-    - name: Upload macOS DMG
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-dmg
-        path: src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
-        retention-days: 30
+      - name: Upload macOS app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-app
+          path: src-tauri/target/release/bundle/macos/课表管理系统.app
 
-    - name: Create Release and upload macOS app
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
-        draft: false
-        prerelease: false
-        generate_release_notes: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload macOS DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
+
+  # 创建 Release
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-macos]
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ -f "VERSION" ]; then
+            VERSION=$(cat VERSION)
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=1.0.0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "课表管理系统 v${{ steps.get_version.outputs.VERSION }}"
+          files: |
+            artifacts/windows-x64/*.exe
+            artifacts/macos-dmg/*.dmg
+          generate_release_notes: true
+          body: |
+            ## 课表管理系统 v${{ steps.get_version.outputs.VERSION }}
+
+            ### 下载
+
+            - **Windows**: 下载 `课表管理系统.exe` （便携式，双击运行无需安装）
+            - **macOS**: 下载 `.dmg` 文件（拖拽安装）
+
+            ### 使用说明
+
+            - Windows: 直接双击 exe 文件运行，无需安装
+            - macOS: 打开 DMG 文件，将应用拖拽到应用程序文件夹
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
