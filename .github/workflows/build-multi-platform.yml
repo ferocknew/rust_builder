@@ -123,7 +123,7 @@ jobs:
           name: "课表管理系统 v${{ steps.get_version.outputs.VERSION }}"
           files: |
             artifacts/windows-exe/*
-.*
+            artifacts/macos-dmg/*
           generate_release_notes: true
           body: |
             ## 课表管理系统 v${{ steps.get_version.outputs.VERSION }}
