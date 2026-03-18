@@ -40,11 +40,14 @@ jobs:
             echo "VERSION=1.0.0" >> $env:GITHUB_OUTPUT
           }
 
+      - name: List built files
+        run: Get-ChildItem -Path src-tauri\target\release\ -Recurse -Include "*.exe"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-x64
-          path: src-tauri/target/release/课表管理系统.exe
+          name: windows-exe
+          path: src-tauri/target/release/*.exe
 
   # 构建 macOS 版本
   build-macos:
@@ -77,17 +80,14 @@ jobs:
             echo "VERSION=1.0.0" >> $GITHUB_OUTPUT
           fi
 
-      - name: Upload macOS app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-app
-          path: src-tauri/target/release/bundle/macos/课表管理系统.app
+      - name: List built files
+        run: ls -R src-tauri/target/release/bundle/
 
       - name: Upload macOS DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-dmg
-          path: src-tauri/target/release/bundle/dmg/课表管理系统_*.dmg
+          path: src-tauri/target/release/bundle/dmg/*.dmg
 
   # 创建 Release
   release:
@@ -104,6 +104,9 @@ jobs:
         with:
           path: artifacts
 
+      - name: List downloaded artifacts
+        run: ls -R artifacts/
+
       - name: Get version
         id: get_version
         run: |
@@ -119,8 +122,8 @@ jobs:
         with:
           name: "课表管理系统 v${{ steps.get_version.outputs.VERSION }}"
           files: |
-            artifacts/windows-x64/*.exe
-            artifacts/macos-dmg/*.dmg
+            artifacts/windows-exe/*
+.*
           generate_release_notes: true
           body: |
             ## 课表管理系统 v${{ steps.get_version.outputs.VERSION }}
